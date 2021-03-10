@@ -1,5 +1,5 @@
 const Note = require('../models/content.model.js');
-
+const User = require("../models/user.model.js");
 // Create and Save a new Note
 exports.create = (req, res) => {
     // Validate request
@@ -115,3 +115,27 @@ exports.delete = (req, res) => {
     });
 };
 
+// create user
+exports.createuser = (req, res) => {
+    // Validate request
+    if(!req.body.email) {
+        return res.status(400).send({
+            message: "Note content can not be empty"
+        });
+    }
+    // Create a Note
+    const note = new User({
+        email: req.body.email || "Untitled Note",
+        password: req.body.password
+    });
+
+    // Save Note in the database
+    note.save()
+    .then(data => {
+        res.send(data);
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while creating the profile."
+        });
+    });
+};

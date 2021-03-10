@@ -1,5 +1,6 @@
 module.exports = (app) => {
     const content = require('../controllers/content.controller');
+    
     // Create a new Note
     app.post('/notes', content.create);
 
@@ -15,5 +16,7 @@ module.exports = (app) => {
     // Delete a Note with noteId
     app.delete('/notes/:noteId', content.delete);
 
-    
+    // create user
+    app.post('/signup',content.createuser);    
 }
+
