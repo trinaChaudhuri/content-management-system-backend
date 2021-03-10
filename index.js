@@ -1,5 +1,6 @@
 var express=require("express");
 var app=express();
+var cors = require('cors');
 var bodyParser = require('body-parser');
 
 // parse requests of content-type - application/x-www-form-urlencoded
@@ -7,6 +8,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // parse requests of content-type - application/json
 app.use(bodyParser.json());
+
+app.use(cors());
 
 // Configuring the database
 const dbConfig = require('./config/database.config.js');
@@ -27,7 +30,7 @@ mongoose.connect(dbConfig.url, {
 // Require Notes routes
 require('./app/routes/content.routes.js')(app);
 
-app.listen(3000,()=>{
+app.listen(3001,()=>{
     console.log('server is running on port 3000')
 })
 

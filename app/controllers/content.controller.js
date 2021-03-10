@@ -139,3 +139,25 @@ exports.createuser = (req, res) => {
         });
     });
 };
+
+//verify user
+exports.verifyuser = (req, res) => {
+    User.findOne(req.params.userId)
+    .then(user => {
+        if(!user) {
+            return res.status(404).send({
+                message: "User not found with id " + req.params.userId
+            });            
+        }
+        res.send(user);
+    }).catch(err => {
+        if(err.kind === 'ObjectId') {
+            return res.status(404).send({
+                message: "Note not found with id " + req.params.userId
+            });                
+        }
+        return res.status(500).send({
+            message: "Error retrieving note with id " + req.params.userId
+        });
+    });
+};
