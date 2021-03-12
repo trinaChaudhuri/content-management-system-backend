@@ -24,6 +24,6 @@ module.exports = (app) => {
     app.post('/signup',cors(),content.createuser);   
     
     // verify user
-    app.get('/login/:userId',cors(),content.verifyuser);
+    app.get('/login/:email',cors(),content.verifyuser);
 }
 

@@ -1,3 +1,4 @@
+const { db } = require('../models/content.model.js');
 const Note = require('../models/content.model.js');
 const User = require("../models/user.model.js");
 // Create and Save a new Note
@@ -128,12 +129,14 @@ exports.createuser = (req, res) => {
         email: req.body.email || "Untitled Note",
         password: req.body.password
     });
-
+    
     // Save Note in the database
     note.save()
     .then(data => {
         res.send(data);
+        console.log('data save to db',data);
     }).catch(err => {
+        console.log('data send to db err',err)
         res.status(500).send({
             message: err.message || "Some error occurred while creating the profile."
         });
@@ -142,22 +145,25 @@ exports.createuser = (req, res) => {
 
 //verify user
 exports.verifyuser = (req, res) => {
-    User.findOne(req.params.userId)
+    User.findById(req.body.email)
     .then(user => {
         if(!user) {
             return res.status(404).send({
-                message: "User not found with id " + req.params.userId
+                message:"no user with email id found"
             });            
         }
-        res.send(user);
+        res.send(user).then(function(res){
+            console.log('verify db res',res)
+        });
     }).catch(err => {
         if(err.kind === 'ObjectId') {
             return res.status(404).send({
-                message: "Note not found with id " + req.params.userId
+                message: "Note not found with id "
             });                
         }
         return res.status(500).send({
-            message: "Error retrieving note with id " + req.params.userId
+            message: "Error retrieving note with id "
         });
     });
 };
+
