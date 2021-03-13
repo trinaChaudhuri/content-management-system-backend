@@ -1,3 +1,7 @@
+## Texh stack used
+Node js 
+Database : MongoDb
+
 ## Available Scripts
 
 In the project directory, you can run:
