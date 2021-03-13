@@ -2,18 +2,36 @@ const { db } = require('../models/content.model.js');
 const Note = require('../models/content.model.js');
 const User = require("../models/user.model.js");
 // Create and Save a new Note
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
     // Validate request
-    if(!req.body.content) {
-        return res.status(400).send({
-            message: "Note content can not be empty"
+    if(!req.body.title) {
+        res.status(400).send({
+            message: "Note title can not be empty"
         });
+        return;
     }
+
+    if(!req.body.userId) {
+        res.status(400).json({message: 'userid required'})
+        return;
+    }
+
+    const user = await getUserById(req.body.userId);
+
+    if(!user._id) {
+        res.status(401).json({message: 'user not found'});
+    }
+
+    
 
     // Create a Note
     const note = new Note({
-        title: req.body.title || "Untitled Note", 
-        content: req.body.content
+        title: req.body.title , 
+        content: req.body.content || "Untitled Note",
+        image:req.body.image || "",
+        video:req.body.video || "",
+        userId: req.body.userId,
+        userEmail: user.email
     });
 
     // Save Note in the database
@@ -27,9 +45,12 @@ exports.create = (req, res) => {
     });
 };
 
-// Retrieve and return all notes from the database.
-exports.findAll = (req, res) => {
-    Note.find()
+// Retrieve and return all notes of one user.
+exports.findNotesByUserId = (req, res) => {
+    if(!validateUserId(req.query.userId)) {
+        res.status(401).json({message: 'user not found'});
+    }
+    Note.find({userId: req.query.userId})
     .then(notes => {
         res.send(notes);
     }).catch(err => {
@@ -39,8 +60,24 @@ exports.findAll = (req, res) => {
     });
 };
 
+//retrieve all notes of all users
+exports.findAllNotes =(req,res) => {
+    Note.find().sort({_id:-1})
+    .then(notes => {
+        res.send(notes);
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while retrieving notes."
+        });
+    });
+}
+
+
 // Find a single note with a noteId
-exports.findOne = (req, res) => {
+exports.getContentById = async (req, res) => {
+    if(!validateUserId(req.query.userId)) {
+        res.status(401).json({message: 'user not found'});
+    }
     Note.findById(req.params.noteId)
     .then(note => {
         if(!note) {
@@ -125,13 +162,13 @@ exports.createuser = (req, res) => {
         });
     }
     // Create a Note
-    const note = new User({
-        email: req.body.email || "Untitled Note",
+    const user = new User({
+        email: req.body.email ,
         password: req.body.password
     });
     
     // Save Note in the database
-    note.save()
+    user.save()
     .then(data => {
         res.send(data);
         console.log('data save to db',data);
@@ -144,26 +181,37 @@ exports.createuser = (req, res) => {
 };
 
 //verify user
-exports.verifyuser = (req, res) => {
-    User.findById(req.body.email)
-    .then(user => {
-        if(!user) {
-            return res.status(404).send({
-                message:"no user with email id found"
-            });            
-        }
-        res.send(user).then(function(res){
-            console.log('verify db res',res)
-        });
-    }).catch(err => {
-        if(err.kind === 'ObjectId') {
-            return res.status(404).send({
-                message: "Note not found with id "
-            });                
-        }
-        return res.status(500).send({
-            message: "Error retrieving note with id "
-        });
+exports.verifyuser = async (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    if(!email || !password) {
+        res.status(400).json({message: 'email or password field empty'})
+    }
+    console.log('email', email)
+
+    const user = await User.findOne({email, password});
+
+    console.log('user', user);
+
+    if(!user) {
+        res.status(401).json({message: 'authentication failed'});
+        return;
+    }
+
+    res.json({
+        message: 'login successfull',
+        userId: user._id
     });
 };
+
+async function validateUserId(id) {
+    const user = await User.findById(id);
+    return user._id ? true : false;
+}
+
+async function getUserById(id) {
+    const user = await User.findById(id);
+    return user;
+}
 

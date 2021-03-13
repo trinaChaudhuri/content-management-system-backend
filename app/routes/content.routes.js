@@ -9,10 +9,12 @@ module.exports = (app) => {
     app.post('/notes',cors(), content.create);
 
     // Retrieve all Notes
-    app.get('/notes',cors(), content.findAll);
+    app.get('/notes/:userId',cors(), content.findNotesByUserId);
+
+    app.get('/notes',cors(),content.findAllNotes);
 
     // Retrieve a single Note with noteId
-    app.get('/notes/:noteId',cors(), content.findOne);
+    app.get('/notes/:noteId',cors(), content.getContentById);
 
     // Update a Note with noteId
     app.put('/notes/:noteId',cors(),content.update);
@@ -24,6 +26,6 @@ module.exports = (app) => {
     app.post('/signup',cors(),content.createuser);   
     
     // verify user
-    app.get('/login/:email',cors(),content.verifyuser);
+    app.post('/login',cors(),content.verifyuser);
 }
 
