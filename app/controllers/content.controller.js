@@ -28,8 +28,6 @@ exports.create = async (req, res) => {
     const note = new Note({
         title: req.body.title , 
         content: req.body.content || "Untitled Note",
-        image:req.body.image || "",
-        video:req.body.video || "",
         userId: req.body.userId,
         userEmail: user.email
     });
@@ -98,60 +96,7 @@ exports.getContentById = async (req, res) => {
     });
 };
 
-// Update a note identified by the noteId in the request
-exports.update = (req, res) => {
-    // Validate Request
-    if(!req.body.content) {
-        return res.status(400).send({
-            message: "Note content can not be empty"
-        });
-    }
 
-    // Find note and update it with the request body
-    Note.findByIdAndUpdate(req.params.noteId, {
-        title: req.body.title || "Untitled Note",
-        content: req.body.content
-    }, {new: true})
-    .then(note => {
-        if(!note) {
-            return res.status(404).send({
-                message: "Note not found with id " + req.params.noteId
-            });
-        }
-        res.send(note);
-    }).catch(err => {
-        if(err.kind === 'ObjectId') {
-            return res.status(404).send({
-                message: "Note not found with id " + req.params.noteId
-            });                
-        }
-        return res.status(500).send({
-            message: "Error updating note with id " + req.params.noteId
-        });
-    });
-};
-
-// Delete a note with the specified noteId in the request
-exports.delete = (req, res) => {
-    Note.findByIdAndRemove(req.params.noteId)
-    .then(note => {
-        if(!note) {
-            return res.status(404).send({
-                message: "Note not found with id " + req.params.noteId
-            });
-        }
-        res.send({message: "Note deleted successfully!"});
-    }).catch(err => {
-        if(err.kind === 'ObjectId' || err.name === 'NotFound') {
-            return res.status(404).send({
-                message: "Note not found with id " + req.params.noteId
-            });                
-        }
-        return res.status(500).send({
-            message: "Could not delete note with id " + req.params.noteId
-        });
-    });
-};
 
 // create user
 exports.createuser = (req, res) => {
@@ -171,9 +116,7 @@ exports.createuser = (req, res) => {
     user.save()
     .then(data => {
         res.send(data);
-        console.log('data save to db',data);
     }).catch(err => {
-        console.log('data send to db err',err)
         res.status(500).send({
             message: err.message || "Some error occurred while creating the profile."
         });
@@ -188,11 +131,9 @@ exports.verifyuser = async (req, res) => {
     if(!email || !password) {
         res.status(400).json({message: 'email or password field empty'})
     }
-    console.log('email', email)
 
     const user = await User.findOne({email, password});
 
-    console.log('user', user);
 
     if(!user) {
         res.status(401).json({message: 'authentication failed'});

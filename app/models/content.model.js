@@ -16,9 +16,6 @@ const ContentSchema = mongoose.Schema({
     content: {
         type:String
     },
-    image:[],
-    video:[],
-    like:Number
 }, {
     timestamps: true
 });

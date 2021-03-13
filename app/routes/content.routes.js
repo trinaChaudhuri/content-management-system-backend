@@ -8,19 +8,14 @@ module.exports = (app) => {
     // Create a new Note
     app.post('/notes',cors(), content.create);
 
-    // Retrieve all Notes
+    // Retrieve all Notes posted by user
     app.get('/notes/:userId',cors(), content.findNotesByUserId);
 
+    // retrieve all notes posted by anyone
     app.get('/notes',cors(),content.findAllNotes);
 
     // Retrieve a single Note with noteId
     app.get('/notes/:noteId',cors(), content.getContentById);
-
-    // Update a Note with noteId
-    app.put('/notes/:noteId',cors(),content.update);
-
-    // Delete a Note with noteId
-    app.delete('/notes/:noteId',cors(),content.delete);
 
     // create user
     app.post('/signup',cors(),content.createuser);   
