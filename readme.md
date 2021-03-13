@@ -1,5 +1,5 @@
 ## Texh stack used
-Node js 
+Node js, 
 Database : MongoDb
 
 ## Available Scripts
